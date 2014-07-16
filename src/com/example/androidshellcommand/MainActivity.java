@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.os.Build;
 
 public class MainActivity extends Activity {
@@ -61,12 +62,36 @@ public class MainActivity extends Activity {
 		imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
 		
 		ShellExecuter exe = new ShellExecuter();
-		command = input.getText().toString();
 		
+		
+		command = input.getText().toString();
+				
 		Log.i(TAG, command);
 		
 		input.setText("");
 		
+		
+		if(!command.equals("")) {
+			
+			String ouput_str = exe.Executer(command);
+			output.setText(ouput_str);
+		}
+		else {
+			Toast.makeText(MainActivity.this, "Please input command.", Toast.LENGTH_SHORT).show();
+		}
+		
+			
+	}
+	
+	public void onRunMonkey(View v) {
+	    
+	    InputMethodManager imm = (InputMethodManager)getSystemService(
+			      Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+		
+		String command = "monkey -v -p com.android.calendar --ignore-crashes --ignore-timeouts --ignore-security-exceptions 10000\n";
+		
+		ShellExecuter exe = new ShellExecuter();
 		String ouput_str = exe.Executer(command);
 		output.setText(ouput_str);
 		

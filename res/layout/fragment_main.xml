@@ -28,6 +28,13 @@
         android:layout_height="wrap_content"
         android:onClick="onExecutor"
         android:text="@string/btn_ctx_str" />
+    
+    <Button
+        android:id="@+id/btn_run_monkey"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onRunMonkey"
+        android:text="@string/btn_run_monkey_str" />
 
     <ScrollView
       android:layout_width="fill_parent"

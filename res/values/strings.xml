@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AndroidShellCommand</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="tv_title_str">Shell Executer</string>
+    <string name="ed_hint_str">Example - ls</string>
+    <string name="btn_ctx_str">Execute</string>
+
+</resources>

@@ -4,18 +4,28 @@ import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.SystemProperties;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Build;
+
+import java.io.FileOutputStream;
+import java.io.File;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
@@ -24,6 +34,31 @@ public class MainActivity extends Activity {
 	private EditText input = null;
 	private TextView output = null;
 	private String command = null;
+		
+	//propterty
+    private static final String ENABLEMONKEYROP = "sys.monkey.enable";
+	
+	private static String isEnableMonkey = "";
+	
+	private Thread runMonkeyThread = new Thread(new Runnable() {
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			ExecuteMonkey();
+						
+			runOnUiThread(new Runnable() { 
+                public void run() 
+                { 
+                    Intent intent = new Intent();
+                    intent.setAction("action.show.alert.dialog");
+                    sendBroadcast(intent);
+                } 
+            }); 
+			
+		}
+		
+	});
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +67,16 @@ public class MainActivity extends Activity {
 		
 		input = (EditText)this.findViewById(R.id.txt);
 		output = (TextView)this.findViewById(R.id.out);
+				
+	}
+	
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Intent intent = new Intent();
+		intent.setClass(this, ShellCommandService.class);
+		this.startService(intent);
 		
 	}
 
@@ -89,15 +134,64 @@ public class MainActivity extends Activity {
 			      Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
 		
-		String command = "monkey -v -p com.android.calendar --ignore-crashes --ignore-timeouts --ignore-security-exceptions 10000\n";
+		isEnableMonkey = SystemProperties.get(ENABLEMONKEYROP, "0");
 		
-		ShellExecuter exe = new ShellExecuter();
-		String ouput_str = exe.Executer(command);
-		output.setText(ouput_str);
+		if(isEnableMonkey.equals("0")) {
+		    runMonkeyThread.start();		    
+		    SystemProperties.set(ENABLEMONKEYROP, "1");
+		} else {
+		    Toast.makeText(MainActivity.this, "Monkey is already started.", Toast.LENGTH_SHORT).show();   
+		}        
 		
 	}
 	
 	
+	//non public function
+	private void ExecuteMonkey() {
+	    
+	    List<String> command = new ArrayList<String>();
+	    
+	    command.add("monkey");
+	    
+	    command.add("-v");
+	    command.add("-s 1");
+//	    command.add("-p com.android.calendar");
+//	    command.add("--throttle 1000");
+//	    command.add("--pct-touch 100");
+//	    command.add("--pct-motion 100");
+	    command.add("--ignore-crashes");
+//	    command.add("--ignore-timeouts");
+	    command.add("--ignore-security-exceptions");
+	    command.add("10000");
+	   		
+		String result = ShellExecuter.ExecuterBuilder(command);
+		
+		WriteTestResult(result);
+
+	    
+	}
+	
+	
+	 private void WriteTestResult(String str) {
+	    
+	    String filename = "myfile";
+        String string = "Hello world!";
+        FileOutputStream outputStream;
+        
+        File file = new File(this.getFilesDir(), filename);
+        
+        Log.i(TAG, this.getFilesDir().getPath());
+        
+        try {
+          outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
+          outputStream.write(str.getBytes());
+          outputStream.close();
+        } catch (Exception e) {
+          e.printStackTrace();
+        }   	    
+	    
+     }
+     	
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */

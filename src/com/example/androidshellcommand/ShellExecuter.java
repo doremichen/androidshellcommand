@@ -1,5 +1,6 @@
 package com.example.androidshellcommand;
 
+import android.os.SystemProperties;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -11,9 +12,26 @@ import java.util.List;
 public class ShellExecuter {
 
     private static final String TAG = ShellExecuter.class.getSimpleName();
+	
+	//propterty
+    private static final String ENABLEMONKEYROP = "sys.monkey.enable";
 
 	public ShellExecuter() {
 		
+	}
+	
+	public final static boolean NoMonkey() {
+	
+		String noMonkey = SystemProperties.get(ENABLEMONKEYROP, "0");
+		
+		return noMonkey.equals("0");
+	
+	}
+	
+	
+	public final static void enableMonkey(String value) {
+	
+		SystemProperties.set(ENABLEMONKEYROP, value);
 	}
 	
 	public final static String Executer(String command) {

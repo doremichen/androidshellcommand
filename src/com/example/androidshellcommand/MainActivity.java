@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemProperties;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,30 +34,8 @@ public class MainActivity extends Activity {
 	private TextView output = null;
 	private String command = null;
 		
-	//propterty
-    private static final String ENABLEMONKEYROP = "sys.monkey.enable";
 	
-	private static String isEnableMonkey = "";
-	
-	private Thread runMonkeyThread = new Thread(new Runnable() {
-
-		@Override
-		public void run() {
-			// TODO Auto-generated method stub
-			ExecuteMonkey();
-						
-			runOnUiThread(new Runnable() { 
-                public void run() 
-                { 
-                    Intent intent = new Intent();
-                    intent.setAction("action.show.alert.dialog");
-                    sendBroadcast(intent);
-                } 
-            }); 
-			
-		}
-		
-	});
+	private Thread runMonkeyThread = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +44,7 @@ public class MainActivity extends Activity {
 		
 		input = (EditText)this.findViewById(R.id.txt);
 		output = (TextView)this.findViewById(R.id.out);
+					
 				
 	}
 	
@@ -74,6 +52,13 @@ public class MainActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
+		
+		boolean noMonkey = ShellExecuter.NoMonkey();
+		
+		if(noMonkey == false) {
+			finish();
+		}
+		
 		Intent intent = new Intent();
 		intent.setClass(this, ShellCommandService.class);
 		this.startService(intent);
@@ -134,15 +119,28 @@ public class MainActivity extends Activity {
 			      Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
 		
-		isEnableMonkey = SystemProperties.get(ENABLEMONKEYROP, "0");
+		runMonkeyThread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				ExecuteMonkey();
+							
+				runOnUiThread(new Runnable() { 
+					public void run() 
+					{ 
+						Intent intent = new Intent();
+						intent.setAction("action.show.alert.dialog");
+						sendBroadcast(intent);
+					} 
+				}); 
+				
+			}
 		
-		if(isEnableMonkey.equals("0")) {
-		    runMonkeyThread.start();		    
-		    SystemProperties.set(ENABLEMONKEYROP, "1");
-		} else {
-		    Toast.makeText(MainActivity.this, "Monkey is already started.", Toast.LENGTH_SHORT).show();   
-		}        
+		});
 		
+		 runMonkeyThread.start();		    
+		 ShellExecuter.enableMonkey("1");
 	}
 	
 	
@@ -154,17 +152,19 @@ public class MainActivity extends Activity {
 	    command.add("monkey");
 	    
 	    command.add("-v");
-	    command.add("-s 1");
-//	    command.add("-p com.android.calendar");
+//	    command.add("-s 1");
+	    command.add("-p com.android.calendar");
 //	    command.add("--throttle 1000");
 //	    command.add("--pct-touch 100");
 //	    command.add("--pct-motion 100");
 	    command.add("--ignore-crashes");
 //	    command.add("--ignore-timeouts");
 	    command.add("--ignore-security-exceptions");
-	    command.add("10000");
+	    command.add("20000");
 	   		
 		String result = ShellExecuter.ExecuterBuilder(command);
+		
+//		String result = ShellExecuter.Executer("monkey -v -p com.android.calendar --ignore-crashes --ignore-security-exceptions 10000");
 		
 		WriteTestResult(result);
 
@@ -174,8 +174,7 @@ public class MainActivity extends Activity {
 	
 	 private void WriteTestResult(String str) {
 	    
-	    String filename = "myfile";
-        String string = "Hello world!";
+	    String filename = "mylog.txt";
         FileOutputStream outputStream;
         
         File file = new File(this.getFilesDir(), filename);

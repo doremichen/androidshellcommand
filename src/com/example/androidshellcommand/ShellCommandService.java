@@ -83,7 +83,12 @@ public class ShellCommandService extends Service {
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     
                     public void onClick(DialogInterface dialog, int which) {
-                    
+						boolean noMonkey = ShellExecuter.NoMonkey();
+						
+						if(noMonkey == false) {	    
+							ShellExecuter.enableMonkey("0");
+						}
+					
                         //do something
                         alertDialog.dismiss();
                     }

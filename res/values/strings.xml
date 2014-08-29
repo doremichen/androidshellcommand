@@ -7,6 +7,7 @@
     <string name="tv_title_str">Shell Executer</string>
     <string name="ed_hint_str">Example - ls</string>
     <string name="btn_ctx_str">Execute</string>
+    <string name="ed_monkey_count_hint_str">count</string>
     <string name="btn_run_monkey_str">Run monkey</string>
 
 </resources>

@@ -31,6 +31,7 @@ public class MainActivity extends Activity {
 	private static final String TAG = MainActivity.class.getSimpleName();
 	
 	private EditText input = null;
+	private EditText input_count = null;
 	private TextView output = null;
 	private String command = null;
 		
@@ -44,7 +45,9 @@ public class MainActivity extends Activity {
 		
 		input = (EditText)this.findViewById(R.id.txt);
 		output = (TextView)this.findViewById(R.id.out);
-					
+		
+		input_count = (EditText)this.findViewById(R.id.et_monkey_count);
+				
 				
 	}
 	
@@ -149,18 +152,20 @@ public class MainActivity extends Activity {
 	    
 	    List<String> command = new ArrayList<String>();
 	    
+	    String count = input_count.getText().toString();
+	    
 	    command.add("monkey");
 	    
 	    command.add("-v");
 //	    command.add("-s 1");
-	    command.add("-p com.android.calendar");
+//	    command.add("-p com.android.calendar");
 //	    command.add("--throttle 1000");
 //	    command.add("--pct-touch 100");
 //	    command.add("--pct-motion 100");
 	    command.add("--ignore-crashes");
 //	    command.add("--ignore-timeouts");
 	    command.add("--ignore-security-exceptions");
-	    command.add("20000");
+	    command.add(count);
 	   		
 		String result = ShellExecuter.ExecuterBuilder(command);
 		

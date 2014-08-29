@@ -29,6 +29,13 @@
         android:onClick="onExecutor"
         android:text="@string/btn_ctx_str" />
     
+    <EditText
+        android:id="@+id/et_monkey_count"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="@string/ed_monkey_count_hint_str" />
+          
     <Button
         android:id="@+id/btn_run_monkey"
         android:layout_width="fill_parent"
